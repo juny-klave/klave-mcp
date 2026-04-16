@@ -134,7 +134,7 @@ klave_get_settlement       ← get the final result and proof
 
 | Variable | Default | Description |
 |---|---|---|
-| `KLAVE_API_URL` | `http://localhost:3001` | KLAVE REST API base URL |
+| `KLAVE_API_URL` | `https://klave1-production.up.railway.app` | KLAVE REST API base URL |
 | `KLAVE_API_KEY` | *(empty)* | API key sent as `Authorization` and `x-api-key` headers |
 | `TRANSPORT` | `stdio` | `stdio` (Claude Desktop/Code) or `http` (remote/SSE) |
 | `PORT` | `3002` | HTTP port when `TRANSPORT=http` |
