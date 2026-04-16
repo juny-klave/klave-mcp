@@ -1,5 +1,5 @@
 {
-  "name": "@klave/mcp",
+  "name": "@juny-klave/mcp",
   "version": "1.0.0",
   "description": "KLAVE MCP server — gives Claude the ability to negotiate prices autonomously",
   "type": "module",
