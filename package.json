@@ -1,0 +1,36 @@
+{
+  "name": "@klave/mcp",
+  "version": "1.0.0",
+  "description": "KLAVE MCP server — gives Claude the ability to negotiate prices autonomously",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "klave-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "inspector": "npx @modelcontextprotocol/inspector node dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.6.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["mcp", "klave", "negotiation", "ai-agents", "agentscope", "autonomous-agents"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/juny-klave/klave-mcp"
+  }
+}

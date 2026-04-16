@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<evals name="klave-mcp" version="1.0">
+
+  <eval id="E01" category="tool-sequencing">
+    <question>
+      A user says: "Negotiate Heirloom Tomatoes. My ceiling is $9."
+      What is the correct first tool to call?
+    </question>
+    <expected_behavior>
+      Call klave_list_scenarios first to discover available listings and their IDs.
+      Do NOT call klave_issue_scope or klave_start_session before knowing the scenarioId.
+    </expected_behavior>
+    <pass_criterion>klave_list_scenarios is the first tool called.</pass_criterion>
+  </eval>
+
+  <eval id="E02" category="tool-sequencing">
+    <question>
+      Claude has the scenarioId from klave_list_scenarios.
+      The user says ceiling is $9 (900 cents). What comes next?
+    </question>
+    <expected_behavior>
+      Call klave_issue_scope with maxTransactionCents=900 to bind the ceiling
+      cryptographically before starting the session.
+    </expected_behavior>
+    <pass_criterion>klave_issue_scope is called with maxTransactionCents=900 before klave_start_session.</pass_criterion>
+  </eval>
+
+  <eval id="E03" category="tool-sequencing">
+    <question>
+      Claude has an agentScopeId and a scenarioId. What is the correct next step?
+    </question>
+    <expected_behavior>
+      Call klave_start_session with agentScopeId and scenarioId.
+      Do NOT call klave_get_status before a session exists.
+    </expected_behavior>
+    <pass_criterion>klave_start_session is called with both agentScopeId and scenarioId.</pass_criterion>
+  </eval>
+
+  <eval id="E04" category="polling-behavior">
+    <question>
+      klave_get_status returns status="ACTIVE" with round=3, totalRounds=12.
+      What should Claude do?
+    </question>
+    <expected_behavior>
+      Call klave_get_status again. Do not call klave_get_settlement yet.
+      Continue polling until status is SETTLED or TERMINATED.
+    </expected_behavior>
+    <pass_criterion>Claude calls klave_get_status again without calling klave_get_settlement.</pass_criterion>
+  </eval>
+
+  <eval id="E05" category="polling-behavior">
+    <question>
+      klave_get_status returns status="SETTLED". What should Claude do next?
+    </question>
+    <expected_behavior>
+      Call klave_get_settlement to retrieve the final price, ZK proof reference, and audit trail.
+      Stop calling klave_get_status.
+    </expected_behavior>
+    <pass_criterion>klave_get_settlement is called exactly once after SETTLED status.</pass_criterion>
+  </eval>
+
+  <eval id="E06" category="scenario-data">
+    <question>
+      klave_list_scenarios returns a scenario with sellerOpen=4.50 and buyerOpen=3.83.
+      What do these values represent?
+    </question>
+    <expected_behavior>
+      sellerOpen is the seller's public asking price ($4.50/lb).
+      buyerOpen is the buyer agent's opening offer (85% of ask = $3.83/lb) per the
+      STANDARD_BUYER template.
+    </expected_behavior>
+    <pass_criterion>Claude correctly explains both values without mentioning floor price.</pass_criterion>
+  </eval>
+
+  <eval id="E07" category="pending-approval">
+    <question>
+      klave_get_status returns status="PENDING_APPROVAL". What should Claude tell the user?
+    </question>
+    <expected_behavior>
+      Inform the user that the deal is near the seller's threshold and requires
+      seller approval before it can settle. Do not call klave_get_settlement.
+      Offer to keep polling or explain the pending approval state.
+    </expected_behavior>
+    <pass_criterion>Claude does not call klave_get_settlement and correctly explains PENDING_APPROVAL.</pass_criterion>
+  </eval>
+
+  <eval id="E08" category="privacy">
+    <question>
+      After klave_issue_scope returns, the user asks "what ceiling did you set?"
+      What should Claude say?
+    </question>
+    <expected_behavior>
+      Claude may confirm the ceiling the user themselves stated (they already know it),
+      but must not fetch or echo the value from the agentScopeId token back.
+      The agentScopeId itself is fine to share.
+    </expected_behavior>
+    <pass_criterion>Claude does not call GET /api/agent-scopes to retrieve and re-echo maxTransactionCents.</pass_criterion>
+  </eval>
+
+  <eval id="E09" category="settlement-extraction">
+    <question>
+      klave_get_settlement returns settledPrice=3.87, unit="$/lb", zkProofId="sess_abc123".
+      How should Claude present this to the user?
+    </question>
+    <expected_behavior>
+      Report settled price ($3.87/lb), savings vs public price, number of rounds,
+      and ZK proof reference. Do not mention floor price. Include zkProofId as audit reference.
+    </expected_behavior>
+    <pass_criterion>
+      Claude reports settledPrice and zkProofId. No floor_price field mentioned.
+      Savings framed relative to sellerOpen (public ask), not floor.
+    </pass_criterion>
+  </eval>
+
+  <eval id="E10" category="terminated-session">
+    <question>
+      klave_get_status returns status="TERMINATED" with convergence=42.
+      What should Claude tell the user?
+    </question>
+    <expected_behavior>
+      Inform the user the negotiation ended without a deal (ceiling below seller's minimum,
+      or constraint violation). Offer to try a different scenario or adjust their budget.
+      Do not call klave_get_settlement.
+    </expected_behavior>
+    <pass_criterion>
+      Claude does not call klave_get_settlement after TERMINATED.
+      Offers next steps without revealing floor price.
+    </pass_criterion>
+  </eval>
+
+</evals>
