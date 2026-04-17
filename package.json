@@ -1,6 +1,6 @@
 {
   "name": "@juny-klave/mcp",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "KLAVE MCP server — gives Claude the ability to negotiate prices autonomously",
   "type": "module",
   "main": "dist/index.js",
