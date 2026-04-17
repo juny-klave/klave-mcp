@@ -1,4 +1,4 @@
-# @klave/mcp
+# @juny-klave/mcp
 
 MCP server that gives Claude the ability to negotiate prices on your behalf — autonomously, privately, and with cryptographic proof of the outcome.
 
@@ -8,11 +8,29 @@ MCP server that gives Claude the ability to negotiate prices on your behalf — 
 
 KLAVE connects Claude to a bilateral negotiation engine. You describe what you want in plain English; Claude calls KLAVE, runs the negotiation through multiple rounds, and reports back with the settled price and a ZK proof reference. Your ceiling is cryptographically bound to the authorization token and never appears in any response — the seller never sees your budget.
 
-**Example:**
+---
 
-> "Negotiate a rate for 200 FEU containers Shanghai to Rotterdam. My ceiling is $2,700."
+## What You Can Negotiate
 
-Claude calls `klave_issue_scope` → `klave_start_session` → `klave_get_status` (loop) → `klave_get_settlement` and returns the settled price. Zero UI required.
+Anything with a price. KLAVE does not require pre-existing listings, platform partnerships, or pre-seeded scenarios. If it has an asking price and you have a ceiling, KLAVE can negotiate it.
+
+**Freight and logistics**
+> "Negotiate 200 FEU containers Shanghai to Rotterdam. They're asking $2,806. My ceiling is $2,700."
+
+**Software and SaaS**
+> "Get me a better price on this CRM license. 500 seats, they want $75,000 annually. I won't go above $58,000."
+
+**Employment and contracts**
+> "A contractor is asking $185/hour for a 6-month engagement. My budget is $150/hour. Negotiate it."
+
+**Real estate**
+> "Negotiate our office lease renewal. Landlord wants $42/sqft. We need to be at $35 or below."
+
+**Legal and settlement**
+> "Negotiate a settlement. The other party is asking $250,000. My ceiling is $180,000."
+
+**Any bilateral negotiation**
+> "They're asking [X]. I won't pay more than [Y]. Negotiate."
 
 ---
 
@@ -88,45 +106,32 @@ Then point Claude Desktop at the local build:
 
 ---
 
-## The 5 tools
+## The 4 tools
 
 | Tool | What it does |
 |---|---|
-| `klave_list_scenarios` | List available negotiation scenarios with opening positions |
-| `klave_issue_scope` | Issue an AgentScope token that cryptographically binds your ceiling |
-| `klave_start_session` | Start a negotiation session for a given scenario |
-| `klave_get_status` | Advance one round and return current state — poll until SETTLED |
-| `klave_get_settlement` | Retrieve the final settled price, ZK proof reference, and audit trail |
+| `klave_negotiate` | Start a negotiation — any subject, any industry, any price range |
+| `klave_advance` | Advance one round — call in a loop until SETTLED or TERMINATED |
+| `klave_status` | Get current state and full round history at any time |
+| `klave_verify` | Get the ZK proof confirming the settlement was conducted fairly |
 
 ### Tool sequence
 
 ```
-klave_list_scenarios       ← discover what can be negotiated
-klave_issue_scope          ← bind your ceiling cryptographically
-klave_start_session        ← start negotiation
-klave_get_status (loop)    ← advance and poll until SETTLED or TERMINATED
-klave_get_settlement       ← get the final result and proof
-```
-
----
-
-## Example prompts
-
-```
-"Negotiate a rate for 200 FEU containers Shanghai to Rotterdam. My ceiling is $2,700."
-
-"I need to hire a contractor. They're asking $150/hour. I won't go above $120. Negotiate it."
-
-"Get me a better price on this software license. The ask is $50,000 annually. My budget is $38,000."
+klave_negotiate        ← describe what you're negotiating and your ceiling
+klave_advance (loop)   ← advance round by round until SETTLED
+klave_status           ← check progress at any time
+klave_verify           ← get cryptographic proof after settlement
 ```
 
 ---
 
 ## Privacy guarantees
 
-- Your ceiling (`maxTransactionCents`) is cryptographically bound in the AgentScope token. It **never** appears in any tool response after `klave_issue_scope`.
-- The seller's floor price is **never** a field in any API response.
-- `leaksDetected` in status responses is sourced from the server — never hardcoded.
+- Your ceiling (`ceiling_price`) is passed to the negotiation engine and **never** appears in any tool response.
+- The seller's floor price is derived server-side and **never** a field in any API response.
+- `leaks_detected` in verify responses is sourced from the server — never hardcoded.
+- Every negotiation generates an auditable ZK proof.
 
 ---
 
@@ -135,7 +140,7 @@ klave_get_settlement       ← get the final result and proof
 | Variable | Default | Description |
 |---|---|---|
 | `KLAVE_API_URL` | `https://klave1-production.up.railway.app` | KLAVE REST API base URL |
-| `KLAVE_API_KEY` | *(empty)* | API key sent as `Authorization` and `x-api-key` headers |
+| `KLAVE_API_KEY` | *(empty)* | API key |
 | `TRANSPORT` | `stdio` | `stdio` (Claude Desktop/Code) or `http` (remote/SSE) |
 | `PORT` | `3002` | HTTP port when `TRANSPORT=http` |
 
@@ -143,13 +148,13 @@ klave_get_settlement       ← get the final result and proof
 
 ## Getting an API key
 
-Sign up at [klavecommerce.com/docs](https://klavecommerce.com/docs) to get your API key and browse available negotiation listings.
+Sign up at [klavecommerce.com/docs](https://klavecommerce.com/docs).
 
 ---
 
-## Agent authorization (AAP SDK)
+## Developer SDK
 
-If you're building an agent that needs to authorize negotiation programmatically, see the [KLAVE AAP SDK](https://github.com/juny-klave/klave-sdk) (`@klave/sdk`).
+If you're building an agent that needs to authorize negotiation programmatically, see the [KLAVE SDK](https://github.com/juny-klave/klave-sdk) (`@juny-klave/sdk`).
 
 ---
 
