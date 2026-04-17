@@ -148,7 +148,7 @@ klave_verify           ← get cryptographic proof after settlement
 
 ## Getting an API key
 
-Sign up at [klavecommerce.com/docs](https://klavecommerce.com/docs).
+Sign up at [klavecommerce.com/docs](https://klavecommerce.com).
 
 ---
 
