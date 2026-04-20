@@ -38,7 +38,7 @@ Anything with a price. KLAVE does not require pre-existing listings, platform pa
 
 - Node.js 18+
 - Claude Desktop or Claude Code
-- A KLAVE API key — [get one at klavecommerce.com](https://klavecommerce.com/docs)
+- A KLAVE API key — [get one at klave-platform.vercel.app/docs](https://klave-platform.vercel.app/docs)
 
 ---
 
@@ -63,7 +63,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 }
 ```
 
-Replace `YOUR_API_KEY` with your key from [klavecommerce.com](https://klavecommerce.com/docs).
+Replace `YOUR_API_KEY` with your key from [klave-platform.vercel.app/docs](https://klave-platform.vercel.app/docs).
 
 ---
 
@@ -148,7 +148,7 @@ klave_verify           ← get cryptographic proof after settlement
 
 ## Getting an API key
 
-Sign up at [klavecommerce.com/docs](https://klavecommerce.com).
+Sign up at [klave-platform.vercel.app/docs](https://klave-platform.vercel.app/docs).
 
 ---
 
